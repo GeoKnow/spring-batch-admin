@@ -1,0 +1,20 @@
+#Framework configuration files
+/src/main/webapp/WEB-INF/web.xml
+/src/main/resources/framework-configuration.ttl
+/src/main/resources/framework-components-local.ttl
+
+#Mac
+.DS_Store
+
+# Eclipse
+.classpath
+.settings
+.project
+.springBeans
+
+# Maven
+/target
+/logs
+
+# Working dirs
+/batch-jobs

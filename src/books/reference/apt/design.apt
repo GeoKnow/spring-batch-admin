@@ -1,0 +1,201 @@
+  ------
+  Design
+
+Design and Architecture
+
+  Spring Batch Admin is a layered, extensible application.  Its main artifacts are 2 JAR files
+  (libraries) containing all the content and business logic for the web application.  To deploy them
+  you need a deployment platform, like a WAR file in a servlet container.  There is a sample application
+  <<<spring-batch-admin-sample>>> which show how this works in practice. 
+
+Application Context Structure
+
+  There is a root or parent application context, and a child context for the UI components.  These
+  are both loaded in the standard Spring MVC way following directives in web.xml.  There are also
+  possibly several additional child contexts (of the main root) containing job configurations.
+  
+    * The root context is loaded from a file in the manager JAR, but all that does is import
+    from well known locations on the classpath:
+    
++---
+<import resource="classpath*:/META-INF/spring/batch/bootstrap/**/*.xml"/>
+<import resource="classpath*:/META-INF/spring/batch/override/**/*.xml"/>
++---
+
+     Note that the "override" location has <no> files in it in Spring Batch Admin distribution.  This is a 
+	 placeholder for users to add their own content.
+
+    * The UI child context is loaded in the same way from
+    
++---
+<import resource="classpath*:/META-INF/spring/batch/servlet/**/*.xml"/>
++---
+
+    N.B. the child context by default only loads when you visit the first page in the 
+    application.  You should be able to see which files it actually loads from the log
+    statements that come out on the server console.
+    
+    * The job contexts are loaded by a special component (<<<ClasspathXmlJobLoader>>> from 
+    Spring Batch) in the parent context.  It looks for individual files in the pattern
+    <<<classpath*/META-INF/spring/batch/jobs/*.xml>>> and loads each file individually as its own self-contained
+    context, registering any instance of <<<Job>>> it finds in the <<<JobRegistry>>> at the top level.
+    
+  The job contexts are loaded in this way so that you can provide your own jobs in multiple
+  (possibly many) JAR files included in the application, but you do not have to worry too much about
+  duplicate bean definitions because only the Job names have to be unique.  A job context inherits
+  the AOP and <<<PropertyPlaceholderConfigurer>>> settings from the root context (not the standard behaviour
+  of a child context) as a convenience, but you can add your own settings to apply locally as well.
+
+Extending the UI
+
+  There are three extension points for the UI: changing or translating
+  text, adding menus, and modifying the content of the existing pages.
+
+* URL Paths
+
+  URL paths start at the context root "/" by default.  If you want to
+  use it with a different context path, just change the servlet
+  mapping in web.xml and override the <<<resourceService>>> bean in
+  the root application context to change the servlet path.
+
+* Text Content
+
+  Text content that doesn't come from the <<<JobRepository>>> is
+  rendered using a standard Spring <<<MessageSource>>>.  To change it
+  you need to provide a bean in your servlet application context
+  (<<<META-INF/spring/batch/servlet/override/*.xml>>>) with id
+  "messageSource" of type <<<MessageSource>>>.  E.g.
+
++---
+<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+   <property name="basename" value="messages"/>
+</bean>
++---
+
+  loads a resource bundle (as per <<<java.util.Resource>>>) from
+  <<<classpath:messages.properties>>>.  See the Spring MVC
+  documentation for more detail on how message sources work.
+
+  The message source is a set of key-value pairs where the key is
+  provided by the application and the value is what you want to be
+  rendered.  To find all the possible key values you would have to
+  inspect all the Freemarker templates in the resources and manager
+  jars, and also the view bean definitions (where for example the page
+  titles are defined) and controller definitions (for error codes).
+
+  (A complete list of message keys would be a great addition to the
+  project.  If anyone wants to automate the compilation of that list
+  please feel free to make a contribution.)
+  
+* Adding a Menu
+
+  Create a component of type
+  <<<org.springframework.batch.admin.web.base.Menu>>> in the UI child
+  context (<<<META-INF/spring/batch/servlet/override/*.xml>>>).  The
+  <<<Menu>>> has a <<<url>>> property that should point to a
+  controller mapping (relative to the application root context).
+  That's it really.
+  
+  If you also want the page you add to fit in with the information
+  architecture of the application as a whole, i.e. show the other
+  menus and links, you will want to implement the view for the menu
+  that you add in a specific way.  That is: you will use a Freemarker
+  template to render the body of the page, and refer to it in a Spring
+  MVC <<<View>>> definition in your servlet XML configuration.  The
+  template can use the standard layout in the application as a parent
+  bean, and that way it inherits the information architecture (menus
+  and styling).  Look in the manager jar for
+  <<<META-INF/spring/batch/servlet/manager/manager-context.xml>>>
+  where you will find some examples. They look like this:
+  
++---
+<bean name="jobs" parent="standard">
+	<property name="attributes">
+		<props merge="true">
+			<prop key="body">/manager/jobs/jobs.ftl</prop>
+			<prop key="titleCode">jobs.title</prop>
+			<prop key="titleText">Spring Batch Admin: Jobs</prop>
+		</props>
+	</property>
+</bean>
++---
+
+  The only mandatory property in this is the "body", which is the location of a 
+  Freemarker template for the main body (business content) of the page.  Freemarker
+  templates by default have paths relative to either <<<classpath:/org/springframework/batch/admin/web>>>
+  or <<</WEB-INF/web>>> (either works but the <<<WEB-INF>>> location is dynamically reloadable
+  at development time).  The other
+  properties shown above are to override the page title: the "code" is a key in
+  the Spring <<<MessageSource>>> and the "text" is the default value if the code cannot 
+  be resolved.
+
+* Modifying Existing Pages
+
+** Styles and Branding
+
+  To change the colors, fonts, branding and layout of existing pages,
+  you can use a cascading style sheet.  The default style sheets are
+  in <<<spring-batch-admin-resources.jar>>> under
+  <<<META-INF/resources/styles>>>.  Most of the things you might need
+  to change will be in <<<main.css>>> or <<<local,css>>>.  To override
+  the settings here you could put a modified copy of those files in
+  your WAR under <<</styles>>> at the top level of your applications
+  (the Spring JS <<<ResourceServlet>>> is used to search the context
+  and all jars in that order).  Or you could modify the standard view
+  bean or its template (see below) to import a style sheet from a
+  different location.
+
+** View Bean Overrides
+
+  In the UI each view is a Spring bean, so one way to change the
+  default views is to override those bean definitions in
+  <<<META-INF/spring/batch/servlet/override/*.xml>>>. The existing
+  menu bars and static content are defined in
+  <<<spring-batch-admin-resources.jar>>>, while the dynamic and
+  Batch-specific content are defined in
+  <<<spring-batch-admin-manager.jar>>>.  In both cases there are view
+  beans defined in <<<META-INF/spring/batch/servlet/**/*.xml>>>.  Some
+  views have html content only and some have json content, in which
+  case the view name ends with <<<.json>>>, e.g. in the manager jar
+  <<<META-INF/spring/batch/servlet/manager/manager-context.xml>>> we
+  have the definitions for the view that renders the list of jobs:
+
++---
+<bean name="jobs" parent="standard">
+   <property name="attributes">
+      <props merge="true">
+         <prop key="body">/manager/jobs/html/jobs.ftl</prop>
+         <prop key="titleCode">jobs.title</prop>
+         <prop key="titleText">Spring Batch Admin: Jobs</prop>
+      </props>
+   </property>
+</bean>
+
+<bean name="jobs.json" parent="standard.json">
+   <property name="attributes">
+      <props merge="true">
+         <prop key="body">/manager/jobs/json/jobs.ftl</prop>
+      </props>
+   </property>
+</bean>
++---
+
+  To override one or other of these you would need to create a Spring
+  config file in <<<META-INF/spring/batch/servlet/override/*.xml>>>
+  and copy the definitions above replacing any of the properties as
+  desired.
+
+** Template Overrides
+
+  Another way to modify the existing views is to override just the
+  Freemarker templates.
+
+  In the JARs the templates are located in sub-directories of
+  <<<org/springframework/batch/admin/web>>>, and you can override them
+  by putting files with the same name and relative path in
+  <<<WEB-INF/web>>>.  For example, the whole look and feel would
+  change if you added a file
+  <<<WEB-INF/web/layouts/html/standard.ftl>>> to your application.
+
+  Files in the <<<WEB-INF/web>>> location are also reloadable at
+  development time.

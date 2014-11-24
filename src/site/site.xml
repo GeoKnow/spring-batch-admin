@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="${project.name}" xmlns="http://maven.apache.org/DECORATION/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+
+	<bannerLeft>
+		<name>${project.name}</name>
+		<href>http://projects.spring.io/spring-batch/
+		</href>
+	</bannerLeft>
+
+	<bannerRight>
+		<src>images/shim.gif</src>
+	</bannerRight>
+	
+	<version/>
+
+	<poweredBy>
+		<logo name="" href="" img="images/shim.gif" />
+	</poweredBy>
+
+	<skin>
+		<groupId>org.springframework.maven.skins
+		</groupId>
+		<artifactId>maven-spring-skin</artifactId>
+		<version>1.0.4</version>
+	</skin>
+
+	<body>
+
+		<links>
+			<item name="Home"
+				href="http://docs.spring.io/spring-batch-admin/" />
+		</links>
+
+		<menu name="Documentation" inherit="none">
+			<item name="Home" href="index.html" />
+			<item name="Getting Started" href="getting-started.html" />
+			<item name="User Guide" href="reference.html" />
+			<item name="API" href="apidocs/index.html" />
+		</menu>
+
+		<menu name="Support" inherit="none">
+			<item name="Building" href="building.html" />
+			<item name="JIRA" href="http://jira.spring.io/browse/BATCHADM" />
+		</menu>
+
+		<menu name="Modules" inherit="none">
+			<item name="Resources" href="spring-batch-admin-resources/index.html" />
+			<item name="Manager" href="spring-batch-admin-manager/index.html" />
+			<item name="Sample" href="spring-batch-admin-sample/index.html" />
+		</menu>
+
+		<menu ref="reports"/>
+
+	</body>
+
+</project>

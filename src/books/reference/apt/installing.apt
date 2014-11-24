@@ -1,0 +1,36 @@
+  ------
+  Installing
+
+Installing Spring Batch Admin
+
+  There is a sample project in the distribution - it's a regular war file project
+  which you can build with Maven (<<<mvn install>>> and look in the <<<target>>> directory). 
+  The sample can also be created with a couple of clicks in the SpringSource
+  Tool Suite (STS): go to <<<File->New->Spring Template Project>>>, and select the 
+  Spring Batch Admin Webapp from the list (if it isn't there upgrade STS). 
+  In STS you can right click on the project and <<<Run As->Run On Server>>> choose Tomcat or tc Server, 
+  and the app will deploy and open a web browser 
+  (e.g. localhost:8080/spring-batch-admin-sample). Check out the features for
+  launching jobs and inspecting job executions.  If the STS project looks out of date
+  (look at the version numbers in the pom.xml) then you might be able to upgrade by changing
+  the POM, or else you may have to install a nightly update of STS or wait for the next release.
+  
+* Building your own applications:
+  
+  It is really easy to build a custom web application with the ability
+  to inspect job execution data from external processes:
+    
+    * Create a war project with an index.jsp and a web.xml (from the sample or from 
+    the <<<spring-batch-admin-resources.jar>>> in the package <<<org.springframework.batch.admin.web.resources>>>).
+    
+    * Include the <<<spring-batch-admin-*.jar>>> files in <<<WEB-INF/lib>>>, plus all their dependencies.  
+    In the sample this is done simply by making the WAR depend on those jar files in the Maven pom.
+    
+    * Deploy the web app.  It starts up with an in-memory database, so without any jobs defined
+    in the application it isn't going to do much at first.  See the 
+    section on environment settings for more detail.
+    
+  See later in this guide for instructions on how to modify the application and add you own 
+  jobs for launching.
+
+
