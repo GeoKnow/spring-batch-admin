@@ -13,8 +13,8 @@
 .springBeans
 
 # Maven
-/target
-/logs
+*/target
+*/logs
 
 # Working dirs
 /batch-jobs

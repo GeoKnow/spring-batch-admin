@@ -1,0 +1,17 @@
+Source: spring-batch-admin-geoknow
+Section: web
+Priority: extra
+Maintainer: Alejandra Garcia-Rojas M <alejandra.garciarojas@ontos.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.4
+Homepage: https://github.com/GeoKnow/spring-batch-admin
+#Vcs-Git: git://git.debian.org/collab-maint/spring-batch-admin-geoknow.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/spring-batch-admin-geoknow.git;a=summary
+
+Package: spring-batch-admin-geoknow
+Architecture: all
+Depends: tomcat7, ${misc:Depends}
+Description: This is an adapted version of spring-batch admin 
+ that is used by the GeoKnow Generator Dashboard. 
+ Processes in the generator can be executed as batch processes
+ thus the user can track their status.

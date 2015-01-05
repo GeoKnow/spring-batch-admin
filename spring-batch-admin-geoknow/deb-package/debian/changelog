@@ -1,0 +1,5 @@
+spring-batch-admin-geoknow (0.0.1) ldstack-nightly; urgency=low
+
+  * Initial protptype to use spring-batch-admin for generator dashboard.
+
+ -- Alejandra Garcia-Rojas M <alejandra.garciarojas@ontos.com>  Mon, 05 Jan 2015 11:59:40 +0100
