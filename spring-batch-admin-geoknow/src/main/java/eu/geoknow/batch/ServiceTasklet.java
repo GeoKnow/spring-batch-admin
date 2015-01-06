@@ -1,7 +1,6 @@
 package eu.geoknow.batch;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
@@ -12,13 +11,14 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 public class ServiceTasklet implements Tasklet, InitializingBean {
 
-    private static final Log log = LogFactory.getLog(ServiceTasklet.class);
+    private static Logger log = Logger.getLogger(ServiceTasklet.class);
 
     private String service;
     private String body;
@@ -50,15 +50,21 @@ public class ServiceTasklet implements Tasklet, InitializingBean {
         try {
             ResponseEntity<String> responseEntity = rest.exchange(service, HttpMethod
                     .valueOf(method.toUpperCase()), requestEntity, String.class);
-            log.debug(responseEntity.getStatusCode());
-
+            log.debug(responseEntity.getBody());
+            //set step status based on HTTP status
+            HttpStatus code = responseEntity.getStatusCode();
+            log.debug(code);
+            //if ok, return 
+            if(code == HttpStatus.OK) return RepeatStatus.FINISHED;
+            if(code == HttpStatus.CREATED) return RepeatStatus.FINISHED;
+            //else set error code and exit with failure
+        	stepcontribution.setExitStatus(ExitStatus.FAILED);
+        	throw new UnexpectedJobExecutionException("Service responded with an error code: "+code);
         } catch (HttpClientErrorException e) {
             stepcontribution.setExitStatus(ExitStatus.FAILED);
             e.printStackTrace();
             throw new UnexpectedJobExecutionException(e.getMessage());
         }
-
-        return RepeatStatus.FINISHED;
     }
 
     public String getService() {
