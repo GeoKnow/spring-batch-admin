@@ -1,6 +1,6 @@
 package eu.geoknow.batch;
 
-import org.apache.log4j.Logger;
+
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
@@ -16,9 +16,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class ServiceTasklet implements Tasklet, InitializingBean {
 
-    private static Logger log = Logger.getLogger(ServiceTasklet.class);
+    // private static Logger log = Logger.getLogger(ServiceTasklet.class);
+
+    private static final Log log = LogFactory.getLog(ServiceTasklet.class);
 
     private String service;
     private String body;

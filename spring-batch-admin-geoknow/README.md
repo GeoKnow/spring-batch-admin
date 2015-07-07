@@ -4,15 +4,40 @@ This is an implementation of [spring-batch-admin-sample](https://github.com/spri
 
 ## Install
 
+1. Use debian packages
+
+A preconfigured setup can be installed to a Linux system trough the Linked Data Stack Debian repository
+
+
+		# download the repository package
+		wget http://stack.linkeddata.org/ldstable-repository.deb
+		# install the repository package
+		sudo dpkg -i ldstable-repository.deb
+		# update the repository database
+		sudo apt-get update
+		# install spring-batch-admin-geoknow
+		sudo apt-get install spring-batch-admin-geoknow
+
+2. Compile from souces
+
+		# clone this reposotory
+		git clone git@github.com:GeoKnow/spring-batch-admin.git
+		# move to the project directory
+		cd spring-batch-admin-geoknow
+		# package it
+		mvn package
 
 ## Configure
 
-If you want to save all job execution status in a database, you need to provide the data connection in""
+The defaiult configuration of spring-batch-admin-geoknow uses a in memory hsql database. You can change the configuration files directly in the webapp:
 
+		spring-batch-admin-geoknow/WEB-INF/classes/batch-hsql.properties
+
+Or you can to configure from sources as described in [spring-batch-admin configuration](http://docs.spring.io/spring-batch-admin/reference/infrastructure.html).
 
 ## Run
-To run the admin service using jetty:
+You can deploy the file on Tomcat or, run the admin service using jetty:
 
-	  mvn -D jetty.port=9999 jetty:run -DENVIRONMENT=mysql
+	  mvn -D jetty.port=9999 jetty:run
   
   
