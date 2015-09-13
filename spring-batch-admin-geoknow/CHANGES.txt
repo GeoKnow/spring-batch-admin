@@ -1,0 +1,2 @@
+release date=22:00 13.09.2015,version=0.0.2,urgency=low,by=Alejandra Garcia-Rojas M <alejandra.garciarojas@ontos.com>,distribution=ldstack-nightly
+ * Service Tasklet improved
