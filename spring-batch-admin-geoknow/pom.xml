@@ -151,12 +151,12 @@
                   </mapper>
                 </data>
               </dataSet>
-              <signPackage>true</signPackage>
+              <!-- signPackage>true</signPackage>
               <signMethod>dpkg-sig</signMethod>
               <signRole>builder</signRole>
               <keyring>/home/user/.gnupg/secring.gpg</keyring>
               <key>***</key>
-              <passphrase>***</passphrase>
+              <passphrase>***</passphrase -->
             </configuration>
           </execution>
         </executions>
